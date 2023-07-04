@@ -1,0 +1,19 @@
+fileFormatVersion: 2
+guid: afe156b1ef480624f863b61a0f9fbc4e
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - bloodEffect: {fileID: 9018852857922559552, guid: 9065ef794248ba544ad40dcbf1129ff6, type: 3}
+  - feet: {instanceID: 0}
+  - wallPoint1: {instanceID: 0}
+  - wallPoint2: {instanceID: 0}
+  - atkPoint1: {instanceID: 0}
+  - atkPoint2: {instanceID: 0}
+  - atkPoint3: {instanceID: 0}
+  - shakeSource: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
