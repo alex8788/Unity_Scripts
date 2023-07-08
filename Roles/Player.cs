@@ -1,16 +1,20 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using Cinemachine;
 using Phy = UnityEngine.Physics2D;
 
 public class Player : Character
 {
+    [Header("基本參數&組件")]
     BoxCollider2D feet; // 觸地檢測器
+    public PlayerInput PlayerInput;
 
 
     [Header("移動")]
-    float inputX; // 移動輸入
+    float inputX; //? 移動輸入
+    public Vector2 inputDir; // 移動輸入方向
 
 
     [Header("跳躍")]
@@ -39,26 +43,25 @@ public class Player : Character
 
 
     [Header("翻滾")]
-    float rollForce = 6f;
+    float rollForce = 6f; // 翻滾力道
 
 
     [Header("布林值")]
-    bool isTouchWall;
+    bool isTouchWall; // 是否觸牆
 
-    bool canAttack3;
+    bool canAttack3; // 大招解鎖
 
-    bool canJump;
-    bool canDbJump;
-    bool canWallJump;
-    bool isJump;
+    bool canDbJump; // 二段跳解鎖
+    bool canWallJump; // 蹬牆跳解鎖
+    bool isJump; // 是否正在跳躍
 
-    bool isWallSlide;
+    bool isWallSlide; // 是否正在滑牆
 
-    bool canRoll;
-    bool isRoll;
+    bool canRoll; // 翻滾解鎖
+    bool isRoll; // 是否正在翻滾
 
-    bool canBlock;
-    bool isBlock;
+    bool canBlock; // 格擋解鎖
+    bool isBlock; // 是否正在格擋
 
 
     //? ----------------------------------------------------------------
@@ -69,14 +72,27 @@ public class Player : Character
     {
         base.Awake();
 
+        // input
+        PlayerInput = new PlayerInput();
+        PlayerInput.Gameplay.Jump.started += Jump;
+
+        // reference
         rb = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
         EnemyMask = LayerMask.GetMask("Enemy");
         ShakeSource = GetComponent<CinemachineImpulseSource>();
-
         feet = transform.Find("Feet").GetComponent<BoxCollider2D>();
     }
 
+    void OnEnable()
+    {
+        PlayerInput.Enable();    
+    }
+
+    void OnDisable()
+    {
+        PlayerInput.Disable();   
+    }
 
     //* Start
     void Start()
@@ -89,6 +105,8 @@ public class Player : Character
     //* Update
     void Update()
     {
+        inputDir = PlayerInput.Gameplay.Move.ReadValue<Vector2>();
+
         if (hp > 0f)
         {
             inputX = Input.GetAxis("Horizontal");
@@ -98,7 +116,6 @@ public class Player : Character
             SetAnime();
 
             if (canTurn) TurnFace();
-            if (canJump) Jump();
             if (canAttack) Attack();
             if (canBlock) Block();
             if (canRoll) Roll();
@@ -134,11 +151,8 @@ public class Player : Character
         else canTurn = false;
 
         //* Jump
-        if (!isHurt) canJump = true;
-        else canJump = false;
-
-        if (!isJump && isTouchGround) canWallJump = true;
         if (isJump && isTouchGround) isJump = false;
+        if (!isJump && isTouchGround) canWallJump = true; // 重置蹬牆跳條件
 
         //* WallSlide
         if (!isHurt && !isAttack && isTouchWall && rb.velocity.y < 0f) isWallSlide = true;
@@ -199,11 +213,11 @@ public class Player : Character
 
 
     //* =================== 跳躍 Jump ===================
-    void Jump()
+    void Jump(InputAction.CallbackContext obj)
     {
-        if (Input.GetButtonDown("Jump"))
+        if (!isHurt)
         {
-            // 一段跳
+            //* 一段跳
             if (isTouchGround)
             {
                 rb.velocity = new Vector2(rb.velocity.x, jumpForce);
@@ -212,8 +226,8 @@ public class Player : Character
                 canDbJump = true;
                 anim.SetTrigger("Jump");
             }
-            // 蹬牆跳
-            else if (canWallJump && isTouchWall) // 當：離地 觸牆
+            //* 蹬牆跳
+            else if (canWallJump && isTouchWall) //?這裡isTouchWall可以刪除
             {
                 rb.velocity = Vector2.up * wallJumpForce;
 
@@ -221,19 +235,18 @@ public class Player : Character
                 canWallJump = false;
                 anim.SetTrigger("Jump");
             }
-            // 二段跳
+            //* 二段跳
             else if (canDbJump)
             {
                 rb.velocity = new Vector2(rb.velocity.x, jumpForce);
 
                 isJump = true;
                 canDbJump = false;
-                canAttack3 = true; // 啟用大招
+                canAttack3 = true; // 解鎖大招
                 anim.SetTrigger("Jump");
             }
         }
     }
-
 
     //* =================== 格擋 Block ===================
     void Block()
