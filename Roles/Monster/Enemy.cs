@@ -174,11 +174,11 @@ public class Enemy : Character
         isAttack = true;
         yield return new WaitForSeconds(0.6f * atkDelay); // 攻擊延遲1
 
-        if (!hasAtkTarget || isBackToPlayer) // 玩家不在攻擊範圍
+        if (!hasAtkTarget || isBackToPlayer) // 玩家不在攻擊範圍 (提前退出)
         {
             yield return new WaitForSeconds(0.5f);
         }
-        else
+        else // 繼續攻擊
         {
             yield return new WaitForSeconds(0.4f * atkDelay); // 攻擊延遲2
             anim.SetTrigger("Attack");
