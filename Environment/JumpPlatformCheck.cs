@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class JumpPlatformCheck : MonoBehaviour
+public class JumpPlatform : MonoBehaviour
 {
     public GameObject PlayerBody;
 

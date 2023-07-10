@@ -14,7 +14,7 @@ public class Player : Character
 
     [Header("移動")]
     float inputX; //? 移動輸入
-    public Vector2 inputDir; // 移動輸入方向
+    public Vector2 inputDir; // 移動輸入向量
 
 
     [Header("跳躍")]
@@ -74,7 +74,7 @@ public class Player : Character
 
         // input
         PlayerInput = new PlayerInput();
-        PlayerInput.Gameplay.Jump.started += Jump;
+        PlayerInput.Gameplay.Jump.started += Jump; // 跳躍輸入事件監聽
 
         // reference
         rb = GetComponent<Rigidbody2D>();
@@ -106,7 +106,7 @@ public class Player : Character
     void Update()
     {
         inputDir = PlayerInput.Gameplay.Move.ReadValue<Vector2>();
-
+        
         if (hp > 0f)
         {
             inputX = Input.GetAxis("Horizontal");
@@ -196,7 +196,7 @@ public class Player : Character
     }
 
 
-    //* =================== 移動 Move ===================
+    //% =================== 移動 Move ===================
     void Move()
     {
         if (isBlock) // 格擋滑步
@@ -212,7 +212,7 @@ public class Player : Character
     }
 
 
-    //* =================== 跳躍 Jump ===================
+    //% =================== 跳躍 Jump ===================
     void Jump(InputAction.CallbackContext obj)
     {
         if (!isHurt)
@@ -248,34 +248,8 @@ public class Player : Character
         }
     }
 
-    //* =================== 格擋 Block ===================
-    void Block()
-    {
-        if (Input.GetButton("Block")) isBlock = true;
-        else isBlock = false;
-    }
 
-
-    //* =================== 翻滾 Roll ===================
-    void Roll()
-    {
-        if (Input.GetButtonDown("Roll"))
-        {
-            isRoll = true;
-            rb.velocity = faceVec * rollForce;
-            anim.SetTrigger("Roll");
-            Invoke("EndRoll", 0.8f);
-        }
-    }
-
-    //* 結束翻滾
-    void EndRoll()
-    {
-        isRoll = false;
-    }
-
-
-    //* =================== 攻擊 Attack ===================
+    //% =================== 攻擊 Attack ===================
     void Attack()
     {
         if (Input.GetButtonDown("attack1"))
@@ -344,7 +318,7 @@ public class Player : Character
     }
 
 
-    //* =================== 受傷 Hurt ===================
+    //% =================== 受傷 Hurt ===================
     public override void Hurt(float damage, Vector2 hurtDir) //* 有擊退受傷
     {
         // 防禦成功
@@ -381,6 +355,33 @@ public class Player : Character
             anim.SetTrigger("Dead");
             this.enabled = false; // 關閉程式
         }
+    }
+
+
+    //% =================== 格擋 Block ===================
+    void Block()
+    {
+        if (Input.GetButton("Block")) isBlock = true;
+        else isBlock = false;
+    }
+
+
+    //% =================== 翻滾 Roll ===================
+    void Roll()
+    {
+        if (Input.GetButtonDown("Roll"))
+        {
+            isRoll = true;
+            rb.velocity = faceVec * rollForce;
+            anim.SetTrigger("Roll");
+            Invoke("EndRoll", 0.8f);
+        }
+    }
+
+    //* 結束翻滾
+    void EndRoll()
+    {
+        isRoll = false;
     }
 
 
